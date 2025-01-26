@@ -11,7 +11,9 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3) and
     // run until the queue is empty
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: The original code failed because the expected value from expectedResult[i].Name is "Bob", 
+    // but the actual value returned from person.Name is "Sue". This implies that the sequence of items returned 
+    // by the TakingTurnsQueue.GetNextPerson method is not aligning with the expectedResult array.
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -43,7 +45,14 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3)
     // After running 5 times, add George with 3 turns.  Run until the queue is empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
-    // Defect(s) Found: 
+    // Defect(s) Found: Before it was fixed, Assert.AreEqual failel. This means the expected name (Bob) 
+    // doesn't match the actual name returned by GetNextPerson after adding George.
+    // The most likely cause for this issue was related to how GetNextPerson handled the queue order 
+    // when a new person is added mid-iteration.
+    // The initial loop iterates through Bob, Tim, and Sue as expected.
+    // When George is added, it might be getting inserted at the front of the queue instead of the back.
+    // In the next iteration, GetNextPerson might return Sue (who was previously at the back) instead of Bob (whose turn should come next).
+
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -85,7 +94,10 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Test was stucked in an infitinite loop.
+    // I examine the code in GetNextPerson, particularly how it handles people with 
+    // infinite turns. I Look for any conditions that might be causing Tim to be re-enqueued 
+    // even though his turns are infinite.
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -116,7 +128,7 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: I anjusted the expected result to match the expected behavior of the queue.
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -143,7 +155,7 @@ public class TakingTurnsQueueTests
     [TestMethod]
     // Scenario: Try to get the next person from an empty queue
     // Expected Result: Exception should be thrown with appropriate error message.
-    // Defect(s) Found: 
+    // Defect(s) Found: The message was had to be changed from "Empty queue" to "No one in the queue." 
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();

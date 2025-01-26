@@ -7,21 +7,21 @@
 /// less than they will stay in the queue forever.  If a person is out of turns then they will 
 /// not be added back into the queue.
 /// </summary>
+
 public class TakingTurnsQueue
 {
-    private readonly PersonQueue _people = new();
-
-    public int Length => _people.Length;
+    private Queue<(Person, int)> _queue = new();
 
     /// <summary>
     /// Add new people to the queue with a name and number of turns
     /// </summary>
     /// <param name="name">Name of the person</param>
     /// <param name="turns">Number of turns remaining</param>
+
     public void AddPerson(string name, int turns)
     {
         var person = new Person(name, turns);
-        _people.Enqueue(person);
+        _queue.Enqueue((person, turns));
     }
 
     /// <summary>
@@ -31,27 +31,28 @@ public class TakingTurnsQueue
     /// person has an infinite number of turns.  An error exception is thrown 
     /// if the queue is empty.
     /// </summary>
+
     public Person GetNextPerson()
     {
-        if (_people.IsEmpty())
+        if (_queue.Count == 0)
         {
             throw new InvalidOperationException("No one in the queue.");
         }
-        else
+
+        var (person, turnsLeft) = _queue.Dequeue();
+
+        // Handle infinite turns or decrement finite turns
+        if (turnsLeft <= 0)
         {
-            Person person = _people.Dequeue();
-            if (person.Turns > 1)
-            {
-                person.Turns -= 1;
-                _people.Enqueue(person);
-            }
-
-            return person;
+            _queue.Enqueue((person, turnsLeft)); // Don't modify turns for infinite turns
         }
+        else if (turnsLeft > 1)
+        {
+            _queue.Enqueue((person, turnsLeft - 1));
+        }
+
+        return person;
     }
 
-    public override string ToString()
-    {
-        return _people.ToString();
-    }
+    public int Length => _queue.Count;
 }

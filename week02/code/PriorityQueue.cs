@@ -3,8 +3,8 @@
     private List<PriorityItem> _queue = new();
 
     /// <summary>
-    /// Add a new value to the queue with an associated priority.  The
-    /// node is always added to the back of the queue regardless of 
+    /// Add a new value to the queue with an associated priority. 
+    /// The node is always added to the back of the queue regardless of 
     /// the priority.
     /// </summary>
     /// <param name="value">The value</param>
@@ -22,16 +22,24 @@
             throw new InvalidOperationException("The queue is empty.");
         }
 
-        // Find the index of the item with the highest priority to remove
-        var highPriorityIndex = 0;
-        for (int index = 1; index < _queue.Count - 1; index++)
+        // Find the index of the item with the highest priority (and earliest enqueue order)
+        int highestPriorityIndex = 0;
+        for (int index = 1; index < _queue.Count; index++)
         {
-            if (_queue[index].Priority >= _queue[highPriorityIndex].Priority)
-                highPriorityIndex = index;
+            if (_queue[index].Priority > _queue[highestPriorityIndex].Priority)
+            {
+                highestPriorityIndex = index;
+            }
+            else if (_queue[index].Priority == _queue[highestPriorityIndex].Priority &&
+                    _queue[index].EnqueueOrder < _queue[highestPriorityIndex].EnqueueOrder)
+            {
+                highestPriorityIndex = index;
+            }
         }
 
         // Remove and return the item with the highest priority
-        var value = _queue[highPriorityIndex].Value;
+        var value = _queue[highestPriorityIndex].Value;
+        _queue.RemoveAt(highestPriorityIndex);
         return value;
     }
 
@@ -45,11 +53,15 @@ internal class PriorityItem
 {
     internal string Value { get; set; }
     internal int Priority { get; set; }
+    internal int EnqueueOrder { get; set; } // Track the order of enqueue
+
+    private static int _enqueueCounter = 0;
 
     internal PriorityItem(string value, int priority)
     {
         Value = value;
         Priority = priority;
+        EnqueueOrder = _enqueueCounter++;
     }
 
     public override string ToString()
