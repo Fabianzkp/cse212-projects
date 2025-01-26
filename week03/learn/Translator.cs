@@ -19,12 +19,13 @@ public class Translator
     /// 
     /// my_translator.AddWord("book","buch")
     /// </summary>
-    /// <param name="fromWord">The word to translate from</param>
-    /// <param name="toWord">The word to translate to</param>
+    /// <param name="initialWord">The word to translate from</param>
+    /// <param name="translateWord">The word to translate to</param>
     /// <returns>fixed array of divisors</returns>
-    public void AddWord(string fromWord, string toWord)
+    public void AddWord(string initialWord, string translateWord)
     {
         // ADD YOUR CODE HERE
+        _words[initialWord] = translateWord;
     }
 
     /// <summary>
@@ -35,6 +36,13 @@ public class Translator
     public string Translate(string fromWord)
     {
         // ADD YOUR CODE HERE
-        return "";
+        string freshWord = "???";
+
+        if (_words.ContainsKey(fromWord))
+        {
+            freshWord = _words[fromWord];
+        }
+
+        return freshWord;
     }
 }
