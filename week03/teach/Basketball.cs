@@ -28,7 +28,7 @@ public class Basketball
             }
         }
 
-        // Get top 10 players by total points
+        // Get the top 10 players by total points
         var topPlayers = players
             .OrderByDescending(x => x.Value) // Order by descending points
             .Take(10) // Take top 10 players
