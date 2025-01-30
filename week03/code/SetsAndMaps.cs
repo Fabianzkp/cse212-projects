@@ -109,31 +109,61 @@ public static class SetsAndMaps
     /// Reminder: You can access a letter by index in a string by 
     /// using the [] notation. 
     /// </summary> 
-    public static bool IsAnagram(string str1, string str2)
+    public static bool IsAnagram(string word1, string word2)
     {
-        if (str1 == null || str2 == null) return false;
+        // TODO Problem 3 - ADD YOUR CODE HERE
 
-        // Normalize strings: remove spaces and convert to lowercase
-        str1 = str1.Replace(" ", "").ToLower();
-        str2 = str2.Replace(" ", "").ToLower();
+        // Remove spaces and convert to lowercase
+        word1 = word1.Replace(" ", "").ToLower();
+        word2 = word2.Replace(" ", "").ToLower();
 
-        if (str1.Length != str2.Length) return false;
-
-        // Use an array instead of Dictionary to store character counts
-        int[] charCounts = new int[256];
-
-        foreach (char c in str1)
-            charCounts[c]++;
-
-        foreach (char c in str2)
+        // If the lengths are different, they cannot be anagrams
+        if (word1.Length != word2.Length)
         {
-            if (--charCounts[c] < 0)
+            return false;
+        }
+
+        // Create dictionaries to count the occurrences of each letter
+        var letterCount1 = new Dictionary<char, int>();
+        var letterCount2 = new Dictionary<char, int>();
+
+        // Count letters in word1
+        foreach (char c in word1)
+        {
+            if (letterCount1.ContainsKey(c))
+            {
+                letterCount1[c]++;
+            }
+            else
+            {
+                letterCount1[c] = 1;
+            }
+        }
+
+        // Count letters in word2
+        foreach (char c in word2)
+        {
+            if (letterCount2.ContainsKey(c))
+            {
+                letterCount2[c]++;
+            }
+            else
+            {
+                letterCount2[c] = 1;
+            }
+        }
+
+        // Compare the two dictionaries
+        foreach (var key in letterCount1.Keys)
+        {
+            if (!letterCount2.ContainsKey(key) || letterCount1[key] != letterCount2[key])
+            {
                 return false;
+            }
         }
 
         return true;
     }
-
 
     /// <summary> 
     /// This function will read JSON (Javascript Object Notation) data from the 
@@ -172,7 +202,6 @@ public static class SetsAndMaps
             return new string[0]; // Handle the case where deserialization fails 
         }
 
-
         var summaries = featureCollection.Features
             .Where(f => f.Properties != null) // Filter out features with null properties 
             .Select(f => $"{f.Properties.Place} - Mag {f.Properties.Mag}")
@@ -181,4 +210,3 @@ public static class SetsAndMaps
         return summaries;
     }
 }
-
